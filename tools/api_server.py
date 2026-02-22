@@ -35,7 +35,22 @@ PDF_HEADERS = {
 def get_client():
     url = os.getenv("SUPABASE_URL")
     key = os.getenv("SUPABASE_SERVICE_KEY")
+    if not url or not key:
+        raise HTTPException(
+            status_code=503,
+            detail="SUPABASE_URL or SUPABASE_SERVICE_KEY not configured",
+        )
     return create_client(url, key)
+
+
+@app.get("/api/health")
+def health_check():
+    """Debug endpoint to verify deployment and env vars."""
+    return {
+        "status": "ok",
+        "supabase_url_set": bool(os.getenv("SUPABASE_URL")),
+        "supabase_key_set": bool(os.getenv("SUPABASE_SERVICE_KEY")),
+    }
 
 
 @app.get("/api/circulars")
