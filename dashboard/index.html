@@ -1,0 +1,155 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Regulatory Circular Aggregator</title>
+    <link rel="stylesheet" href="/static/style.css">
+</head>
+<body>
+    <!-- Aurora Hero Section -->
+    <section class="aurora-hero">
+        <!-- Spiral Canvas Background -->
+        <canvas id="spiralCanvas" class="spiral-canvas"></canvas>
+
+        <!-- Aurora Blobs (overlay on spiral) -->
+        <div class="aurora-bg">
+            <div class="aurora-blob blob-1"></div>
+            <div class="aurora-blob blob-2"></div>
+            <div class="aurora-blob blob-3"></div>
+        </div>
+
+        <div class="hero-content">
+            <div class="hero-header">
+                <div class="hero-left">
+                    <h1 class="hero-title">Regulatory Circulars</h1>
+                    <p class="hero-tagline">SEBI, BSE &amp; NSE — Last 14 Days</p>
+                </div>
+                <div class="hero-right">
+                    <span class="last-updated" id="lastUpdated">Loading...</span>
+                    <button class="btn btn-pill btn-glow" onclick="refreshData()">Refresh</button>
+                </div>
+            </div>
+
+            <!-- Bento Grid Stats -->
+            <div class="bento-grid">
+                <div class="bento-item bento-wide grad-blue">
+                    <div class="bento-shine"></div>
+                    <div class="bento-content">
+                        <div class="bento-icon">
+                            <svg width="32" height="32" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.5">
+                                <path d="M9 5H7a2 2 0 00-2 2v12a2 2 0 002 2h10a2 2 0 002-2V7a2 2 0 00-2-2h-2M9 5a2 2 0 002 2h2a2 2 0 002-2M9 5a2 2 0 012-2h2a2 2 0 012 2"/>
+                            </svg>
+                        </div>
+                        <div class="bento-data">
+                            <span class="bento-value" id="totalCount">—</span>
+                            <span class="bento-label">Total Circulars</span>
+                        </div>
+                    </div>
+                </div>
+                <div class="bento-item grad-cyan" style="animation-delay: 0.1s">
+                    <div class="bento-shine"></div>
+                    <div class="bento-content">
+                        <div class="bento-icon">
+                            <svg width="28" height="28" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.5">
+                                <path d="M12 22s8-4 8-10V5l-8-3-8 3v7c0 6 8 10 8 10z"/>
+                            </svg>
+                        </div>
+                        <div class="bento-data">
+                            <span class="bento-value" id="sebiCount">—</span>
+                            <span class="bento-label">SEBI</span>
+                        </div>
+                    </div>
+                </div>
+                <div class="bento-item grad-red" style="animation-delay: 0.2s">
+                    <div class="bento-shine"></div>
+                    <div class="bento-content">
+                        <div class="bento-icon">
+                            <svg width="28" height="28" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.5">
+                                <path d="M3 3v18h18M7 16l4-4 4 4 6-6"/>
+                            </svg>
+                        </div>
+                        <div class="bento-data">
+                            <span class="bento-value" id="bseCount">—</span>
+                            <span class="bento-label">BSE</span>
+                        </div>
+                    </div>
+                </div>
+                <div class="bento-item grad-green" style="animation-delay: 0.3s">
+                    <div class="bento-shine"></div>
+                    <div class="bento-content">
+                        <div class="bento-icon">
+                            <svg width="28" height="28" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.5">
+                                <circle cx="12" cy="12" r="10"/><path d="M2 12h20M12 2a15.3 15.3 0 014 10 15.3 15.3 0 01-4 10 15.3 15.3 0 01-4-10 15.3 15.3 0 014-10z"/>
+                            </svg>
+                        </div>
+                        <div class="bento-data">
+                            <span class="bento-value" id="nseCount">—</span>
+                            <span class="bento-label">NSE</span>
+                        </div>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </section>
+
+    <main>
+        <!-- Filter Bar -->
+        <div class="filter-bar" id="filterBar">
+            <div class="filter-group">
+                <label for="fromDate">From</label>
+                <input type="date" id="fromDate" class="filter-input">
+            </div>
+            <div class="filter-group">
+                <label for="toDate">To</label>
+                <input type="date" id="toDate" class="filter-input">
+            </div>
+            <div class="filter-group">
+                <label for="categoryFilter">Category</label>
+                <select id="categoryFilter" class="filter-input">
+                    <option value="">All Categories</option>
+                </select>
+            </div>
+            <div class="filter-actions">
+                <button class="btn btn-pill btn-primary" onclick="applyFilters()">Apply</button>
+                <button class="btn btn-pill btn-outline" onclick="clearFilters()">Clear</button>
+            </div>
+        </div>
+
+        <!-- Tabs -->
+        <div class="tabs-container">
+            <div class="tabs" id="tabs">
+                <button class="tab active" data-source="ALL" onclick="switchTab('ALL')">All</button>
+                <button class="tab" data-source="SEBI" onclick="switchTab('SEBI')">SEBI</button>
+                <button class="tab" data-source="BSE" onclick="switchTab('BSE')">BSE</button>
+                <button class="tab" data-source="NSE" onclick="switchTab('NSE')">NSE</button>
+                <button class="tab tab-bookmark" data-source="BOOKMARKS" onclick="switchTab('BOOKMARKS')">
+                    <svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
+                        <path d="M19 21l-7-5-7 5V5a2 2 0 012-2h10a2 2 0 012 2z"/>
+                    </svg>
+                    Bookmarked
+                </button>
+            </div>
+        </div>
+
+        <!-- Circular List -->
+        <div class="circular-list" id="circularList">
+            <div class="loading-state">
+                <div class="spinner"></div>
+                <p>Loading circulars...</p>
+            </div>
+        </div>
+
+        <div class="empty-state" id="emptyState" style="display:none;">
+            <p id="emptyText">No circulars found for this source in the last 14 days.</p>
+        </div>
+    </main>
+
+    <footer>
+        <p>Regulatory Circular Aggregator &mdash; Built with B.L.A.S.T. Protocol</p>
+    </footer>
+
+    <script src="/static/app.js"></script>
+    <script src="/static/spiral.js"></script>
+</body>
+</html>

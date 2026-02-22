@@ -1,0 +1,28 @@
+Colors
+Primary:
+#0C4DA2
+Accent:
+#19579B
+Background:
+#E0E0E0
+Text Primary:
+#E30514
+Link:
+#E30514
+Fonts
+San Francisco(body)
+Typography
+primary: San Francisco
+heading: San Francisco
+h1: 16px
+h2: 16px
+body: 16px
+Spacing
+Base Unit:
+4
+Border Radius:
+3px
+Personality
+Tone: professional
+Energy: medium
+Audience: educational institutions and corporate training sectors
